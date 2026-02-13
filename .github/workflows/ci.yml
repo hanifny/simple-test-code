@@ -96,17 +96,16 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Install wait-on
+        run: npm install -g wait-on
+
       - name: Start Server in Background
-        # Kita jalankan aplikasi di background menggunakan '&'
-        # agar langkah selanjutnya (k6) bisa berjalan.
-        run: npm start & 
+        run: npm start &
         env:
           PORT: 3000
 
       - name: Wait for Server
-        # Beri jeda sedikit agar server Express benar-benar 'up'
-        # sebelum k6 mulai mengirim request.
-        run: sleep 10
+        run: wait-on http://localhost:3000 --timeout 30000
 
       - name: Run k6 Load Test
         uses: grafana/k6-action@v0.3.1
