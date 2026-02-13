@@ -87,15 +87,33 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
-      - name: Install
+          node-version: '18'
+
+      - name: Install Dependencies
         run: npm install
-      - name: Run App & k6
+
+      - name: Start App and Wait
         run: |
-          npm start &
-          sleep 10
-          curl -v http://localhost:3000 || true
-          npx k6 run loadtest/script.js --env BASE_URL=http://localhost:3000
+          # Jalankan server dan simpan lognya
+          npm start > server.log 2>&1 &
+          
+          # Tunggu server booting
+          echo "Waiting for server to start..."
+          sleep 15
+          
+          # DEBUG
+          cat server.log | tail -n 20
+          
+          # DEBUG: Cek port yang aktif (ini akan membantu kita tahu port aslinya)
+          netstat -tuln | grep LISTEN
+
+      - name: Run k6 Load Test
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: loadtest/script.js
+        env:
+          BASE_URL: http://localhost:3000
