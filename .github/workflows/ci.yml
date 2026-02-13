@@ -88,6 +88,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Start Server in Background
+        # Kita jalankan aplikasi di background menggunakan '&'
+        # agar langkah selanjutnya (k6) bisa berjalan.
+        run: npm start & 
+        env:
+          PORT: 3000
+
+      - name: Wait for Server
+        # Beri jeda sedikit agar server Express benar-benar 'up'
+        # sebelum k6 mulai mengirim request.
+        run: sleep 10
+
       - name: Run k6 Load Test
         uses: grafana/k6-action@v0.3.1
         with:
