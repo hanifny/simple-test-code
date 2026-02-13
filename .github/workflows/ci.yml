@@ -103,9 +103,19 @@ jobs:
         run: npm start &
         env:
           PORT: 3000
+          HOST: 0.0.0.0
 
       - name: Wait for Server
         run: wait-on http://localhost:3000 --timeout 30000
+
+      - name: Debug - Check if server is running
+        run: |
+          echo "Checking processes:"
+          ps aux | grep node
+          echo "Checking port 3000:"
+          netstat -tuln | grep 3000 || ss -tuln | grep 3000
+          echo "Testing curl:"
+          curl -v http://localhost:3000/notes || echo "Curl failed"
 
       - name: Run k6 Load Test
         uses: grafana/k6-action@v0.3.1
