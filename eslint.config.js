@@ -19,6 +19,9 @@ module.exports = [
       "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
       "no-console": "off",
       "eqeqeq": ["error", "always"]
-    }
-  })
+    },
+    globals: {
+      __ENV: 'readonly',
+    },
+  }),
 ];
